@@ -155,6 +155,7 @@ export const counterSlice = createSlice({
       let splitKeyPath = Array.isArray(action.payload[0])
       ? action.payload[0]
       : action.payload[0].split("."); // ["a", "b", "c"]
+      console.log("🚀 ~ file: counterSlice.ts ~ line 158 ~ payload", action.payload)
       
       console.log("🚀 ~ file: counterSlice.ts ~ line 156 ~ action.payload[2]", action.payload[2]);
       console.log("🚀 ~ file: counterSlice.ts ~ line 159 ~ splitKeyPath", splitKeyPath);
