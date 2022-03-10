@@ -94,6 +94,29 @@ export const counterSlice = createSlice({
     incrementByAmount: (state, action: PayloadAction<number>) => {
       state.value += action.payload;
     },
+    updateState: (state, action: PayloadAction<any>) => {
+      let splitKeyPath = Array.isArray(action.payload[0])
+      ? action.payload[0]
+      : action.payload[0].split("."); // ["a", "b", "c"]
+
+        let splitUp = splitKeyPath
+          .reverse()
+          .reduce(
+            (obj: object, next: string, i: number) =>
+              i !== action.payload[0].indexOf(action.payload[0][0])
+                ? { [next]: obj }
+                : {
+                    [next]:
+                      typeof action.payload[1] === "boolean" ||
+                      typeof action.payload[1] === "string" ||
+                      typeof action.payload[1] === "number"
+                        ? action.payload[1]
+                        : console.log("not a primitive")
+                  },
+            {}
+          );
+        return {...state, ...splitUp}
+    },
     nestedHandler: (state, action: PayloadAction<any>) => {
     
       // let splitKeyPath = Array.isArray(JSON.parse(action.payload[0]))
@@ -230,6 +253,7 @@ export const {
   incrementByAmount,
   nestedHandler,
   arrayHandler,
+  updateState
 } = counterSlice.actions;
 
 // The function below is called a selector and allows us to select a value from

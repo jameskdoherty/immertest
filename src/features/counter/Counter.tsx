@@ -10,6 +10,7 @@ import {
   //incrementIfOdd,
   selectCount,
   nestedHandler,
+  updateState,
   selectNestedCount,
 } from './counterSlice';
 import styles from './Counter.module.css';
@@ -108,9 +109,9 @@ export function Counter() {
         <button
           className={styles.button}
           aria-label="Increment value"
-          onClick={() => dispatch(nestedHandler(["aaa", {bbb: {ccc: 15}}, "add"]))}
+          onClick={() => dispatch(updateState(['todosArray', {done2: true}]))}
         >
-          {`try to update already set nest obj`}
+          testing updateState
         </button>
       </div>
       <div className={styles.row}>
@@ -123,3 +124,8 @@ export function Counter() {
     </div>
   );
 }
+
+
+// dispatch(updateState('todosArray, {id:done2: true}, "add"))
+
+// todosArray['id1'] split(regex), const regex = /[.\[\]]
