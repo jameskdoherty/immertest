@@ -10,6 +10,8 @@ import {
   //incrementIfOdd,
   selectCount,
   nestedHandler,
+  deleteItem,
+  patchItem,
   updateState,
   selectNestedCount,
 } from './counterSlice';
@@ -21,30 +23,31 @@ export function Counter() {
   const dispatch = useAppDispatch();
   //const [incrementAmount, setIncrementAmount] = useState('2');
 
-
-
-
-
   const keyPathRef = useRef<any>(null);
   const [keyPath, setKeyPath] = useState<any>("");
   //const incrementValue = Number(incrementAmount) || 0;
 
-  const [baseState, setDatas] = useState([
+  // const [baseState, setDatas] = useState([
 
-    { 
-      title: "Learn Typescript",
-      done: true
-    },
-    {
-      title: "Try immer",
-      done: false,
-      todosArray: [
-        { id: "id1", done: false, body: "Take out the trash" },
-        { id: "id2", done: false, body: "Check Email" },
-      ]
-    }
+  //   { 
+  //     title: "Learn Typescript",
+  //     done: true
+  //   },
+  //   {
+  //     title: "Try immer",
+  //     done: false,
+  //     todosArray: [
+  //       { id: "id1", done: false, body: "Take out the trash" },
+  //       { id: "id2", done: false, body: "Check Email" },
+  //     ]
+  //   }
   
-  ])
+  // ])
+  
+  
+  // updateState('address.mainStreet["12"].apartment.1A', (currentValue, draft, produce) => {
+    
+  // })
   
   useEffect(() => {
     //console.log("🚀 ~ file: Counter.tsx ~ line 28 ~ useEffect ~ keyPath", keyPath)
@@ -67,7 +70,7 @@ export function Counter() {
         </div>
       </div>
       <div className={styles.row}>
-        <button
+        {/* <button
           className={styles.button}
           aria-label="Decrement value"
           onClick={() => dispatch(decrement())}
@@ -81,22 +84,32 @@ export function Counter() {
           onClick={() => dispatch(increment())}
         >
           +
-        </button>
+        </button> */}
         <button
           className={styles.button}
           aria-label="Increment value"
-          onClick={() => dispatch(nestedHandler([baseState, {id: "id3", done: true, body: "Go to work"}, "add"]))}
+          onClick={() => dispatch(nestedHandler([keyPath, {id: "id3", done: true, body: "Go to work"}, "add"]))}
         >
           {`[todosArray, {id: "id3", done: false, body: "Go to work"}, "add"]`}
         </button>
 
-        {/* <button
+        <button
           className={styles.button}
-          aria-label="Increment value"
-          onClick={() => dispatch(nestedHandler([baseState, keyPath, "add"]))}
+          aria-label="Delete"
+          onClick={() => dispatch(deleteItem([keyPath, {id: "id3", done: true, body: "Go to work"}, "delete"]))}
         >
-          {`keypath`}
-        </button> */}
+          {`Del`}
+        </button>
+
+        <button
+          className={styles.button}
+          aria-label="Patch"
+          onClick={() => dispatch(patchItem([keyPath, {id: "id3", done: true, body: "Go to work"}, "delete"]))}
+        >
+          {`Patch`}
+        </button>
+
+    
 
 
         <button

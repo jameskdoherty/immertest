@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { bindActionCreators, createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState, AppThunk } from "../../app/store";
 import { fetchCount } from "./counterAPI";
 import React, { useCallback, useState } from "react";
@@ -90,11 +90,23 @@ export const counterSlice = createSlice({
     decrement: (state) => {
       state.value -= 1;
     },
+
+    deleteItem: (state, action: PayloadAction<any>) => {
+      state.todosArray.splice(0,1,'')
+  
+    },
+    
+    patchItem: (state, action: PayloadAction<any>) => {
+     // state.todosArray.splice(0,1,'')
+  
+      },
     // Use the PayloadAction type to declare the contents of `action.payload`
     incrementByAmount: (state, action: PayloadAction<number>) => {
       state.value += action.payload;
     },
     updateState: (state, action: PayloadAction<any>) => {
+      let splitt = Array.isArray(action.payload[0])
+      console.log("🚀 ~ UpdateState: counterSlice.ts ~ line 106 ~ splitKeyPath", splitt)
       let splitKeyPath = Array.isArray(action.payload[0])
       ? action.payload[0]
       : action.payload[0].split("."); // ["a", "b", "c"]
@@ -122,15 +134,6 @@ export const counterSlice = createSlice({
       // let splitKeyPath = Array.isArray(JSON.parse(action.payload[0]))
       // ? JSON.parse(action.payload[0])
       // : action.payload[0].split(".");
-
-      // const nextState = produce(initialState, draftState => {
-      //   draftState.todosArray.push({ title: 'resolvedz', done: true })
-      //  // draftState[1].done = action.payload[1];
-      // });
-
-      // const nextTodo = produce(otherTodosArray, draft  => {
-      //   draft.users.get("17").todos[0].done = action.payload[1];
-      // })
       
       function arrayHandle() {
         let arrayLogic;
@@ -178,40 +181,40 @@ export const counterSlice = createSlice({
       let splitKeyPath = Array.isArray(action.payload[0])
       ? action.payload[0]
       : action.payload[0].split("."); // ["a", "b", "c"]
-      console.log("🚀 ~ file: counterSlice.ts ~ line 158 ~ payload", action.payload)
-      
-      console.log("🚀 ~ file: counterSlice.ts ~ line 156 ~ action.payload[2]", action.payload[2]);
-      console.log("🚀 ~ file: counterSlice.ts ~ line 159 ~ splitKeyPath", splitKeyPath);
-      // const newData = produce(state, (draft) => {
-      //   let splitUp = splitKeyPath
-      //     .reverse()
-      //     .reduce(
-      //       (obj: object, next: string, i: number) =>
-      //         i !== action.payload[0].indexOf(action.payload[0][0])
-      //           ? { [next]: obj }
-      //           : {
-      //               [next]:
-      //                 typeof action.payload[1] === "boolean" ||
-      //                 typeof action.payload[1] === "string" ||
-      //                 typeof action.payload[1] === "number"
-      //                   ? action.payload[1]
-      //                   : arrayHandle(), // this check is wrong, need to see if state key is an array (or object)
-      //             },
-      //       {}
-      //     );
-      //   return (draft = splitUp);
-      // });
-      // let newObj = { ...newData };
-      // console.log("🚀 ~ file: counterSlice.ts ~ line 194 ~ newObj", newObj)
-      // return newObj;
-
-      
-
-
-
-      return produce(state, draft => {
-        draft.todosArray.push(action.payload[1]);
+     
+      const newData = produce(state, (draft) => {
+        let splitUp = splitKeyPath
+          .reverse()
+          .reduce(
+            (obj: object, next: string, i: number) => 
+              
+             
+              i !== action.payload[0].indexOf(action.payload[0][0])
+                ? { [next]: obj }
+                : {
+                    [next]:
+                      typeof action.payload[1] === "boolean" ||
+                      typeof action.payload[1] === "string" ||
+                      typeof action.payload[1] === "number"
+                        ? action.payload[1]
+                        : arrayHandle(), // this check is wrong, need to see if state key is an array (or object)
+                  },
+            {},
+            console.log('action',action.payload[1])
+          );
+        return (draft = splitUp);
       });
+      let newObj = { ...newData };
+      console.log("🚀 ~ file: counterSlice.ts ~ line 193 ~ newObj", newObj)
+      return newObj;
+
+      
+
+
+
+      // return produce(state, draft => {
+      //   draft.todosArray.push(action.payload[1]);
+      // });
     },
     arrayHandler: (state, action: PayloadAction<any>) => {
     console.log("🚀 ~ file: counterSlice.ts ~ line 192 ~ action", action)
@@ -253,7 +256,9 @@ export const {
   incrementByAmount,
   nestedHandler,
   arrayHandler,
-  updateState
+  updateState,
+  deleteItem,
+  patchItem
 } = counterSlice.actions;
 
 // The function below is called a selector and allows us to select a value from
