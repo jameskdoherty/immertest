@@ -92,7 +92,17 @@ export const counterSlice = createSlice({
     },
 
     deleteItem: (state, action: PayloadAction<any>) => {
-      state.todosArray.splice(0,1,'')
+
+      //state.todosArray.splice(0,1)
+      let targetArray = action.payload[0];
+      let stateKeys = Object.keys(state);
+      console.log("🚀 ~ file: counterSlice.ts ~ line 99 ~ stateKeys", stateKeys)
+      let something = stateKeys.filter((element) => {
+       
+        return element === targetArray;
+      })
+      console.log("🚀 ~ file: counterSlice.ts ~ line 101 ~ something ~ something", something);
+      
   
     },
     

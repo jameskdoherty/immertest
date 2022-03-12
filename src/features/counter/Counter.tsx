@@ -96,7 +96,7 @@ export function Counter() {
         <button
           className={styles.button}
           aria-label="Delete"
-          onClick={() => dispatch(deleteItem([keyPath, {id: "id3", done: true, body: "Go to work"}, "delete"]))}
+          onClick={() => dispatch(deleteItem([keyPath, {"id":"id1","done":false,"body":"Take out the trash"}, "delete"]))}
         >
           {`Del`}
         </button>
