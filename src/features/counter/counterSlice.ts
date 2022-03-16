@@ -2,63 +2,62 @@ import { bindActionCreators, createAsyncThunk, createSlice, PayloadAction } from
 import { RootState, AppThunk } from "../../app/store";
 import { fetchCount } from "./counterAPI";
 import React, { useCallback, useState } from "react";
-import produce from "immer";
+import { original, isDraft, produce, current} from "immer";
+
+
 import { enableMapSet } from "immer";
+import { isPropertyName } from "typescript";
+import { DRAFT_STATE } from "immer/dist/internal";
 
 enableMapSet();
-
-
-
-
-
-
-
-const otherTodosArray = {
-  users: new Map([
-    [
-      "17",
-      { 
-        name: "Michel",
-        todos: [
-          {
-            title: "Get coffee",
-            done: false,
-            id: "id3",
-            body: "Take out the trash"
-
-          }
-        ]
-      }
-    ]
-  ])
-}
-
-
-
-
-
-
 
 export interface CounterState {
   value: number;
   //status: 'idle' | 'loading' | 'failed';
   //ArticleOneProps: object;
-  todosArray: any;
+  todosArray: Array<any>;
+  tomosArray: Array<any>;
   aaa: object;
 }
 
-const initialState: CounterState = {
+type State = {
+  value: number
+}
+
+const initialState = {
+  id:"345",
   value: 0,
   todosArray: [
-    { id: "id1", done: false, body: "Take out the trash" },
+    { id: "id1", done: true, body: "Take out the trash" },
     { id: "id2", done: false, body: "Check Email" },
+    { id: "id3", done: false, body: "Check Coffee" }
+  ],
+  tomosArray: [
+    { id: "id1", done: false, body: "Take out the trashed" },
+    { id: "id2", done: false, body: "Check EmailZZZZ" },
   ],
   aaa: {
     bbb: {
-      ccc: 10
+      ccc: 10,
+      done: false
     }
-  }
+  },
+  users: [
+    "17",
+    {
+      name: "Michael",
+      todos: [
+        {
+          title: "Get Coffee",
+          done: false
+        }
+      ]
+    }
+  ]
 };
+
+
+
 
 // The function below is called a thunk and allows us to perform async logic. It
 // can be dispatched like a regular action: `dispatch(incrementAsync(10))`. This
@@ -93,23 +92,71 @@ export const counterSlice = createSlice({
 
     deleteItem: (state, action: PayloadAction<any>) => {
 
-      //state.todosArray.splice(0,1)
-      let targetArray = action.payload[0];
-      let stateKeys = Object.keys(state);
-      console.log("🚀 ~ file: counterSlice.ts ~ line 99 ~ stateKeys", stateKeys)
-      let something = stateKeys.filter((element) => {
-       
-        return element === targetArray;
-      })
-      console.log("🚀 ~ file: counterSlice.ts ~ line 101 ~ something ~ something", something);
-      
-  
-    },
+     
+//state.filter
+
+
+    console.log("🚀 ~ file: counterSlice.ts ~ line 93 ~ action", action)
+      for (const propName of Object.keys(initialState)) {
+        if (propName === action.payload[0]) {
+          console.log("🚀 ~ file: counterSlice.ts ~ line 108 ~ FOUND propName", propName)
+          let itemToBeRemoved = action.payload[1];
+
     
-    patchItem: (state, action: PayloadAction<any>) => {
-     // state.todosArray.splice(0,1,'')
-  
+          const newData = produce(state, (draft: any) => {
+            console.log("🚀 ~ file: counterSlice.ts ~ line 93 ~ itemToBeRemoved", itemToBeRemoved)
+            //draft[propName].push('c');
+
+            //const targetNode = draft.find((propName:any) => propName.id === action.payload)
+            //console.log("🚀 ~ file: littleSlice.ts ~ line 48 ~ newData ~ targetNode", targetNode)
+            
+            draft[propName].splice(draft[propName].findIndex((a: any) => a.id === itemToBeRemoved.id), 1);
+          })
+          return {...newData};
+        }
+      }
+    },
+
+    updateItem: (initialState, action: PayloadAction<any>) => {
+      for (const propName of Object.keys(initialState)) {
+        if (propName === action.payload[0]) {
+          console.log("🚀 ~ file: counterSlice.ts ~ line 108 ~ FOUND propName", propName)
+          const newData = produce(initialState, (draft:any) => {
+            draft[action.payload[0]] = action.payload[1]
+          })
+          return {...newData};
+        }
+      }
+    },
+
+    patchItemDeep: (store, action: PayloadAction<any>) => {
+      console.log("🚀 ~ file: littleSlice.ts ~ line 40 ~ action", action)
+          
+        let targetItem = action.payload[0];
+        let getItem = action.payload[2];
+        let thingToChange = action.payload[3];
+             
+        const newData = produce(store, (draft: any) => {
+          //draft.todosArray.get(getItem).thingToChange.done = true;
+          const targetNode = draft.users.get('17')
+          console.log("🚀 ~ file: littleSlice.ts ~ line 48 ~ newData ~ targetNode", targetNode)
+        })
+        return { ...newData };
+        //state.todosArray.splice(0,1,'')
+      
       },
+
+    addItem: (initialState, action: PayloadAction<any>) => {
+      for (const propName of Object.keys(initialState)) {
+        if (propName === action.payload[0]) {
+          console.log("🚀 ~ file: counterSlice.ts ~ line 108 ~ FOUND propName", propName)
+          const newData = produce(initialState, (draft:any) => {
+            draft[action.payload[0]] = action.payload[1]
+          })
+          return {...newData};
+        }
+      }
+    },
     // Use the PayloadAction type to declare the contents of `action.payload`
     incrementByAmount: (state, action: PayloadAction<number>) => {
       state.value += action.payload;
@@ -268,8 +315,13 @@ export const {
   arrayHandler,
   updateState,
   deleteItem,
-  patchItem
+  updateItem,
+  addItem,
+  patchItemDeep
 } = counterSlice.actions;
+
+
+
 
 // The function below is called a selector and allows us to select a value from
 // the state. Selectors can also be defined inline where they're used instead of

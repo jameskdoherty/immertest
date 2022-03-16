@@ -11,10 +11,13 @@ import {
   selectCount,
   nestedHandler,
   deleteItem,
-  patchItem,
+  patchItemDeep,
+  addItem,
+  updateItem,
   updateState,
   selectNestedCount,
 } from './counterSlice';
+
 import styles from './Counter.module.css';
 
 export function Counter() {
@@ -57,7 +60,7 @@ export function Counter() {
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setKeyPath(e.target.value)
   }
-  console.log("🚀 ~ file: Counter.tsx ~ line 35 ~ Counter ~ nestedCount", nestedCount)
+  //console.log("🚀 ~ file: Counter.tsx ~ line 35 ~ Counter ~ nestedCount", nestedCount)
 
 
   return (
@@ -85,31 +88,53 @@ export function Counter() {
         >
           +
         </button> */}
-        <button
+        {/* <button
           className={styles.button}
           aria-label="Increment value"
           onClick={() => dispatch(nestedHandler([keyPath, {id: "id3", done: true, body: "Go to work"}, "add"]))}
         >
           {`[todosArray, {id: "id3", done: false, body: "Go to work"}, "add"]`}
+        </button> */}
+
+        <button
+          className={styles.button}
+          aria-label="Increment value"
+          onClick={() => dispatch(nestedHandler([keyPath, {id: "id3", done: true, body: "Go to work"}, "add"]))}
+        >
+          {`NestedHandler`}
         </button>
 
         <button
           className={styles.button}
           aria-label="Delete"
-          onClick={() => dispatch(deleteItem([keyPath, {"id":"id1","done":false,"body":"Take out the trash"}, "delete"]))}
+          onClick={() => dispatch(deleteItem([keyPath, {"id":"id2","done":true,"body":"Take out the trash payload COunter"}, "delete"]))}
         >
           {`Del`}
         </button>
 
         <button
           className={styles.button}
-          aria-label="Patch"
-          onClick={() => dispatch(patchItem([keyPath, {id: "id3", done: true, body: "Go to work"}, "delete"]))}
+          aria-label="Update Item"
+          onClick={() => dispatch(updateItem([keyPath, {id: "id3", done: true, body: "Go to work"}, "delete"]))}
         >
-          {`Patch`}
+          {`Update Item`}
         </button>
 
-    
+        <button
+          className={styles.button}
+          aria-label="Patch Item Deep"
+          onClick={() => dispatch(patchItemDeep([keyPath, {id: "id3", done: true, body: "Go to work"}, "345","tomosArray[1]" ]))}
+        >
+          {`Patch item Deep`}
+        </button>
+
+        {/* <button
+          className={styles.button}
+          aria-label="Remove First Item"
+          onClick={() => dispatch(patchItem([keyPath, {id: "id3", done: true, body: "Go to work"}, "delete"]))}
+        >
+          {`Remove First Item`}
+        </button> */}
 
 
         <button
