@@ -68,7 +68,7 @@ export function Second() {
           onClick={() =>
             dispatch(
               wrongHandler([
-                keyPath,
+                'a.b.todosArray',
                 { id: "id2", done: true, body: "Check Email" },
                 "update",
               ])
