@@ -1,63 +1,67 @@
-import { bindActionCreators, createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  bindActionCreators,
+  createAsyncThunk,
+  createSlice,
+  PayloadAction,
+} from "@reduxjs/toolkit";
 import { RootState, AppThunk } from "../../app/store";
 import { fetchCount } from "./counterAPI";
 import React, { useCallback, useState } from "react";
-import { original, isDraft, produce, current} from "immer";
-
+import { original, isDraft, produce, current } from "immer";
 
 import { enableMapSet } from "immer";
 import { isPropertyName } from "typescript";
-import { DRAFT_STATE } from "immer/dist/internal";
+import { DRAFT_STATE, WritableDraft } from "immer/dist/internal";
 
 enableMapSet();
 
 export interface CounterState {
+  id: string;
   value: number;
   //status: 'idle' | 'loading' | 'failed';
   //ArticleOneProps: object;
   todosArray: Array<any>;
-  tomosArray: Array<any>;
-  aaa: object;
+  // tomosArray: Array<any>;
+  // aaa: object;
+  // users: any[];
+
 }
 
 type State = {
-  value: number
-}
+  value: number;
+};
 
-const initialState = {
-  id:"345",
+const initialState: CounterState = {
+  id: "345",
   value: 0,
   todosArray: [
     { id: "id1", done: true, body: "Take out the trash" },
     { id: "id2", done: false, body: "Check Email" },
-    { id: "id3", done: false, body: "Check Coffee" }
-  ],
-  tomosArray: [
-    { id: "id1", done: false, body: "Take out the trashed" },
-    { id: "id2", done: false, body: "Check EmailZZZZ" },
-  ],
-  aaa: {
-    bbb: {
-      ccc: 10,
-      done: false
-    }
-  },
-  users: [
-    "17",
-    {
-      name: "Michael",
-      todos: [
-        {
-          title: "Get Coffee",
-          done: false
-        }
-      ]
-    }
-  ]
+    { id: "id3", done: false, body: "Check Coffee" },
+   ],
+  // tomosArray: [
+  //   { id: "id1", done: false, body: "Take out the trashed" },
+  //   { id: "id2", done: false, body: "Check EmailZZZZ" },
+  // ],
+  // aaa: {
+  //   bbb: {
+  //     ccc: 10,
+  //     done: false,
+  //   },
+  // },
+  // users: [
+  //   "17",
+  //   {
+  //     name: "Michael",
+  //     todos: [
+  //       {
+  //         title: "Get Coffee",
+  //         done: false,
+  //       },
+  //     ],
+  //   },
+  // ],
 };
-
-
-
 
 // The function below is called a thunk and allows us to perform async logic. It
 // can be dispatched like a regular action: `dispatch(incrementAsync(10))`. This
@@ -79,7 +83,7 @@ export const counterSlice = createSlice({
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: {
     increment: (state) => {
-    console.log("🚀 ~ file: counterSlice.ts ~ line 98 ~ state", state.value)
+      console.log("🚀 ~ file: counterSlice.ts ~ line 98 ~ state", state.value);
       // Redux Toolkit allows us to write "mutating" logic in reducers. It
       // doesn't actually mutate the state because it uses the Immer library,
       // which detects changes to a "draft state" and produces a brand new
@@ -91,28 +95,35 @@ export const counterSlice = createSlice({
     },
 
     deleteItem: (state, action: PayloadAction<any>) => {
+      //state.filter
 
-     
-//state.filter
-
-
-    console.log("🚀 ~ file: counterSlice.ts ~ line 93 ~ action", action)
+      console.log("🚀 ~ file: counterSlice.ts ~ line 93 ~ action", action);
       for (const propName of Object.keys(initialState)) {
         if (propName === action.payload[0]) {
-          console.log("🚀 ~ file: counterSlice.ts ~ line 108 ~ FOUND propName", propName)
+          console.log(
+            "🚀 ~ file: counterSlice.ts ~ line 108 ~ FOUND propName",
+            propName
+          );
           let itemToBeRemoved = action.payload[1];
 
-    
           const newData = produce(state, (draft: any) => {
-            console.log("🚀 ~ file: counterSlice.ts ~ line 93 ~ itemToBeRemoved", itemToBeRemoved)
+            console.log(
+              "🚀 ~ file: counterSlice.ts ~ line 93 ~ itemToBeRemoved",
+              itemToBeRemoved
+            );
             //draft[propName].push('c');
 
             //const targetNode = draft.find((propName:any) => propName.id === action.payload)
             //console.log("🚀 ~ file: littleSlice.ts ~ line 48 ~ newData ~ targetNode", targetNode)
-            
-            draft[propName].splice(draft[propName].findIndex((a: any) => a.id === itemToBeRemoved.id), 1);
-          })
-          return {...newData};
+
+            draft[propName].splice(
+              draft[propName].findIndex(
+                (a: any) => a.id === itemToBeRemoved.id
+              ),
+              1
+            );
+          });
+          return { ...newData };
         }
       }
     },
@@ -120,40 +131,48 @@ export const counterSlice = createSlice({
     updateItem: (initialState, action: PayloadAction<any>) => {
       for (const propName of Object.keys(initialState)) {
         if (propName === action.payload[0]) {
-          console.log("🚀 ~ file: counterSlice.ts ~ line 108 ~ FOUND propName", propName)
-          const newData = produce(initialState, (draft:any) => {
-            draft[action.payload[0]] = action.payload[1]
-          })
-          return {...newData};
+          console.log(
+            "🚀 ~ file: counterSlice.ts ~ line 108 ~ FOUND propName",
+            propName
+          );
+          const newData = produce(initialState, (draft: any) => {
+            draft[action.payload[0]] = action.payload[1];
+          });
+          return { ...newData };
         }
       }
     },
 
     patchItemDeep: (store, action: PayloadAction<any>) => {
-      console.log("🚀 ~ file: littleSlice.ts ~ line 40 ~ action", action)
-          
-        let targetItem = action.payload[0];
-        let getItem = action.payload[2];
-        let thingToChange = action.payload[3];
-             
-        const newData = produce(store, (draft: any) => {
-          //draft.todosArray.get(getItem).thingToChange.done = true;
-          const targetNode = draft.users.get('17')
-          console.log("🚀 ~ file: littleSlice.ts ~ line 48 ~ newData ~ targetNode", targetNode)
-        })
-        return { ...newData };
-        //state.todosArray.splice(0,1,'')
-      
-      },
+      console.log("🚀 ~ file: littleSlice.ts ~ line 40 ~ action", action);
+
+      let targetItem = action.payload[0];
+      let getItem = action.payload[2];
+      let thingToChange = action.payload[3];
+
+      const newData = produce(store, (draft: any) => {
+        //draft.todosArray.get(getItem).thingToChange.done = true;
+        const targetNode = draft.users.get("17");
+        console.log(
+          "🚀 ~ file: littleSlice.ts ~ line 48 ~ newData ~ targetNode",
+          targetNode
+        );
+      });
+      return { ...newData };
+      //state.todosArray.splice(0,1,'')
+    },
 
     addItem: (initialState, action: PayloadAction<any>) => {
       for (const propName of Object.keys(initialState)) {
         if (propName === action.payload[0]) {
-          console.log("🚀 ~ file: counterSlice.ts ~ line 108 ~ FOUND propName", propName)
-          const newData = produce(initialState, (draft:any) => {
-            draft[action.payload[0]] = action.payload[1]
-          })
-          return {...newData};
+          console.log(
+            "🚀 ~ file: counterSlice.ts ~ line 108 ~ FOUND propName",
+            propName
+          );
+          const newData = produce(initialState, (draft: any) => {
+            draft[action.payload[0]] = action.payload[1];
+          });
+          return { ...newData };
         }
       }
     },
@@ -162,45 +181,70 @@ export const counterSlice = createSlice({
       state.value += action.payload;
     },
     updateState: (state, action: PayloadAction<any>) => {
-      let splitt = Array.isArray(action.payload[0])
-      console.log("🚀 ~ UpdateState: counterSlice.ts ~ line 106 ~ splitKeyPath", splitt)
+      let splitt = Array.isArray(action.payload[0]);
+      console.log(
+        "🚀 ~ UpdateState: counterSlice.ts ~ line 106 ~ splitKeyPath",
+        splitt
+      );
       let splitKeyPath = Array.isArray(action.payload[0])
-      ? action.payload[0]
-      : action.payload[0].split("."); // ["a", "b", "c"]
+        ? action.payload[0]
+        : action.payload[0].split("."); // ["a", "b", "c"]
+      console.log(
+        "🚀 ~ UpdateState: counterSlice.ts ~ line 190 ~ splitKeyPath",
+        splitKeyPath
+      );
 
-        let splitUp = splitKeyPath
-          .reverse()
-          .reduce(
-            (obj: object, next: string, i: number) =>
-              i !== action.payload[0].indexOf(action.payload[0][0])
-                ? { [next]: obj }
-                : {
-                    [next]:
-                      typeof action.payload[1] === "boolean" ||
-                      typeof action.payload[1] === "string" ||
-                      typeof action.payload[1] === "number"
-                        ? action.payload[1]
-                        : console.log("not a primitive")
-                  },
-            {}
-          );
-        return {...state, ...splitUp}
+      let splitUp = splitKeyPath.reverse().reduce(
+        (obj: object, next: string, i: number) =>
+          i !== action.payload[0].indexOf(action.payload[0][0])
+            ? { [next]: obj }
+            : {
+                [next]:
+                  typeof action.payload[1] === "boolean" ||
+                  typeof action.payload[1] === "string" ||
+                  typeof action.payload[1] === "number"
+                    ? action.payload[1]
+                    : console.log("not a primitive"),
+              },
+        {}
+      );
+      console.log(
+        "🚀 ~ UpdateState: counterSlice.ts ~ line 209 ~ splitUp",
+        splitUp
+      );
+
+      return { ...state, ...splitUp };
     },
     nestedHandler: (state, action: PayloadAction<any>) => {
-    
       // let splitKeyPath = Array.isArray(JSON.parse(action.payload[0]))
       // ? JSON.parse(action.payload[0])
       // : action.payload[0].split(".");
-      
-      function arrayHandle() {
+
+      function arrayHandle(endNodeOnKeyPath: any) {
         let arrayLogic;
-        
-        
         switch (action.payload[2]) {
           case "update":
-            arrayLogic = produce(state, (draft: any) => {
-              draft.todosArray[1].done = action.payload[1];
-            });
+            // const filtered = produce(state as CounterState & { endNodeOnKeyPath: any }, (draft: any) => {
+            //   console.log(state.todosArray);
+            //   console.log(draft);
+            //   return )
+            // });
+            console.log(state.todosArray.filter, 'isDraft direct access')
+            console.log(state['todosArray']['filter'], 'isDraft key access')
+            return state['todosArray'] = {...state['todosArray'][0], done: false};
+          
+
+
+            //const filtered = state.todosArray.filter((item: any) => item['id'] !== action.payload[1]['id']);
+            //console.log("filtered", filtered);
+
+
+            //const isADraft = isDraft(state.todosArray);
+            //console.log(isADraft);
+            // console.log("we hit the update path");
+            //return [ ...filtered, action.payload[1] ]
+            //arrayLogic = arrayLogic.todosArray;
+            //arrayLogic = state.todosArray[1];
             break;
           case "add":
             arrayLogic = produce(state, (draft: any) => {
@@ -210,7 +254,10 @@ export const counterSlice = createSlice({
           default:
             break;
         }
-        console.log("🚀 ~ file: counterSlice.ts ~ line 152 ~ arrayHandle ~ arrayLogic", arrayLogic)
+        console.log(
+          "🚀 ~ file: counterSlice.ts ~ line 152 ~ arrayHandle ~ arrayLogic",
+          arrayLogic
+        );
 
         // return produce(state, draft => {
         //   draft.todosArray.push(action.payload[1]);
@@ -235,46 +282,33 @@ export const counterSlice = createSlice({
       //   return objectLogic;
       // }
 
-      let splitKeyPath = Array.isArray(action.payload[0])
-      ? action.payload[0]
-      : action.payload[0].split("."); // ["a", "b", "c"]
-     
-      const newData = produce(state, (draft) => {
-        let splitUp = splitKeyPath
-          .reverse()
-          .reduce(
-            (obj: object, next: string, i: number) => 
-              
-             
-              i !== action.payload[0].indexOf(action.payload[0][0])
-                ? { [next]: obj }
-                : {
-                    [next]:
-                      typeof action.payload[1] === "boolean" ||
-                      typeof action.payload[1] === "string" ||
-                      typeof action.payload[1] === "number"
-                        ? action.payload[1]
-                        : arrayHandle(), // this check is wrong, need to see if state key is an array (or object)
-                  },
-            {},
-            console.log('action',action.payload[1])
-          );
-        return (draft = splitUp);
-      });
-      let newObj = { ...newData };
-      console.log("🚀 ~ file: counterSlice.ts ~ line 193 ~ newObj", newObj)
-      return newObj;
+      let splitKeyPath = Array.isArray(action.payload[0]) //action.payload[0] = keyPath
+        ? action.payload[0]
+        : action.payload[0].split("."); // ["a", "b", "c"]
+      let splitUp = splitKeyPath.reverse().reduce(
+        (obj: object, next: string, i: number) =>
+          i !== action.payload[0].indexOf(action.payload[0][0])
+            ? { [next]: obj }
+            : {
+                [next]:
+                  typeof action.payload[1] === "boolean" ||
+                  typeof action.payload[1] === "string" ||
+                  typeof action.payload[1] === "number"
+                    ? action.payload[1]
+                    : arrayHandle(action.payload[0][0]), // needs non primitive for action.payload[1]
+              },
+        {},
+        console.log("action", action.payload[1])
+      );
 
-      
-
-
+      return { ...state, ...splitUp };
 
       // return produce(state, draft => {
       //   draft.todosArray.push(action.payload[1]);
       // });
     },
     arrayHandler: (state, action: PayloadAction<any>) => {
-    console.log("🚀 ~ file: counterSlice.ts ~ line 192 ~ action", action)
+      console.log("🚀 ~ file: counterSlice.ts ~ line 192 ~ action", action);
       let arrayLogic;
       switch (action.payload[2]) {
         case "update":
@@ -317,11 +351,8 @@ export const {
   deleteItem,
   updateItem,
   addItem,
-  patchItemDeep
+  patchItemDeep,
 } = counterSlice.actions;
-
-
-
 
 // The function below is called a selector and allows us to select a value from
 // the state. Selectors can also be defined inline where they're used instead of

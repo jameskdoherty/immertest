@@ -140,14 +140,14 @@ export function Counter() {
         <button
           className={styles.button}
           aria-label="Increment value"
-          onClick={() => dispatch(nestedHandler([keyPath, true]))}
+          onClick={() => dispatch(nestedHandler([keyPath, {"id":"id2","done":true,"body":"Check Email"}, "update"]))}
         >
-          {`['helloWorld', true]`}
+          nestedHandler to filter todos
         </button>
         <button
           className={styles.button}
           aria-label="Increment value"
-          onClick={() => dispatch(updateState(['todosArray', {done2: true}]))}
+          onClick={() => dispatch(updateState([keyPath, 'MichaelTwo']))}
         >
           testing updateState
         </button>
