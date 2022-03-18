@@ -10,6 +10,8 @@ import {
   //incrementIfOdd,
   selectCount,
   nestedHandler,
+  nestedHandlerOrig,
+  nestedHandlerWithSplit,
   deleteItem,
   patchItemDeep,
   addItem,
@@ -91,17 +93,33 @@ export function Counter() {
         {/* <button
           className={styles.button}
           aria-label="Increment value"
-          onClick={() => dispatch(nestedHandler([keyPath, {id: "id3", done: true, body: "Go to work"}, "add"]))}
+          onClick={() => dispatch(nestedHandler([keyPath, {id: "id3", done: true, body: "Go to work"}, "update"]))}
         >
-          {`[todosArray, {id: "id3", done: false, body: "Go to work"}, "add"]`}
+          {`Update nestedhandler`}
         </button> */}
 
         <button
           className={styles.button}
           aria-label="Increment value"
-          onClick={() => dispatch(nestedHandler([keyPath, {id: "id3", done: true, body: "Go to work"}, "add"]))}
+          onClick={() => dispatch(nestedHandler([keyPath, {id: "id45", done: true, body: "Go down the street"}, "update"]))}
         >
           {`NestedHandler`}
+        </button>
+
+        <button
+          className={styles.button}
+          aria-label="Increment value"
+          onClick={() => dispatch(nestedHandler([keyPath, {id: "id5", done: true, body: "Go down the branch"}, "specialbranch"]))}
+        >
+          {`NestedHandler specialbranch`}
+        </button>
+
+        <button
+          className={styles.button}
+          aria-label="Increment value"
+          onClick={() => dispatch(nestedHandlerWithSplit([keyPath, {id: "id3", done: true, body: "Go to worksy please"}, "update"]))}
+        >
+          {`NestedHandler with split`}
         </button>
 
         <button
