@@ -2,13 +2,17 @@ import React, { useEffect, useState, useRef } from "react";
 
 import { useAppSelector, useAppDispatch } from "../../app/hooks";
 
-import {
-  workingHandler,
-  selectCount,
-  selectNestedCount,
-} from "./secondSlice";
+import { workingHandler, selectCount, selectNestedCount } from "./secondSlice";
 
 import styles from "./Counter.module.css";
+
+import { produce } from "immer";
+
+export interface ThirdState {
+  id: string;
+  value: number;
+  todosArray: any;
+}
 
 export function Second() {
   const count = useAppSelector(selectCount);
@@ -20,26 +24,15 @@ export function Second() {
   const [keyPath, setKeyPath] = useState<any>("");
   //const incrementValue = Number(incrementAmount) || 0;
 
-  // const [baseState, setDatas] = useState([
-
-  //   {
-  //     title: "Learn Typescript",
-  //     done: true
-  //   },
-  //   {
-  //     title: "Try immer",
-  //     done: false,
-  //     todosArray: [
-  //       { id: "id1", done: false, body: "Take out the trash" },
-  //       { id: "id2", done: false, body: "Check Email" },
-  //     ]
-  //   }
-
-  // ])
-
-  // updateState('address.mainStreet["12"].apartment.1A', (currentValue, draft, produce) => {
-
-  // })
+  const initialState: ThirdState = {
+    id: "345",
+    value: 0,
+    todosArray: [
+      { id: "id1", done: true, body: "Take out the garbage" },
+      { id: "id2", done: false, body: "Do Homework" },
+      { id: "id3", done: false, body: "Check Coffee" },
+    ],
+  };
 
   useEffect(() => {
     //console.log("🚀 ~ file: Counter.tsx ~ line 28 ~ useEffect ~ keyPath", keyPath)
@@ -51,6 +44,14 @@ export function Second() {
   };
   //console.log("🚀 ~ file: Counter.tsx ~ line 35 ~ Counter ~ nestedCount", nestedCount)
 
+  const updateState = (payload: any) => {
+    const newData = produce(initialState, draft => { 
+      console.log(payload);
+      draft.todosArray.push(payload);
+  });
+    console.log(initialState);
+  };
+
   return (
     <div>
       <div className={styles.row}>
@@ -58,12 +59,20 @@ export function Second() {
           initialState:
           {
             <div>
-              <pre>{JSON.stringify(nestedCount, null, 10)}</pre>
+              <pre>{JSON.stringify(initialState, null, 10)}</pre>
             </div>
           }
         </div>
       </div>
       <div className={styles.row}>
+      <button
+          onClick={() => updateState({ id: "id4", done: false, body: "Get Car Washed" })}
+          // should change the body to whatever has been put into textbox
+          // make update state function that dispatches and its action.payload accepts function
+          //
+        >
+            immer import direct
+        </button>
         <button
           className={styles.button}
           aria-label="Increment value"
@@ -117,6 +126,7 @@ export function Second() {
         >
           Update set path
         </button>
+        
       </div>
       <div className={styles.row}>
         <form className={styles.input}>
