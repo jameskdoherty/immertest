@@ -1,23 +1,39 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
-import { isDraft, produce, enableMapSet, castDraft, createDraft } from "immer";
+import {
+  isDraft,
+  enableMapSet,
+  original,
+  createDraft,
+} from "immer";
 
 enableMapSet();
 
 export interface SecondState {
   id: string;
   value: number;
-  todosArray: Array<any>;
+  todosArray: any;
+  //a: object;
 }
 
 const initialState: SecondState = {
   id: "345",
   value: 0,
+
   todosArray: [
     { id: "id1", done: true, body: "Take out the trash" },
-    { id: "id2", done: false, body: "Check Email" },
+    { id: "id2", done: false, body: "Do Homework" },
     { id: "id3", done: false, body: "Check Coffee" },
   ],
+//   a: {
+//       b: {
+//           tomosArray: [
+//             { id: "id4", done: true, body: "Brush Teethh" },
+//             { id: "id5", done: false, body: "Do Homework" },
+//             { id: "id6", done: false, body: "Read Book" },
+//           ]
+//       }
+//   }
 };
 
 export const secondSlice = createSlice({
@@ -25,13 +41,16 @@ export const secondSlice = createSlice({
   initialState,
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: {
-    wrongHandler: (state: any, action: PayloadAction<any>) => {
+    workingHandler: (state: any, action: PayloadAction<any>) => {
       //   let splitKeyPath = Array.isArray(action.payload[0]) //action.payload[0] = keyPath
       //     ? action.payload[0]
       //     : action.payload[0].split("."); // ["a", "b", "c"]
-      const reversedKeyPath = action.payload[0].split(".").reverse();
+      const reversedKeyPath = action.payload[0].includes(".")
+        ? action.payload[0].split(".").reverse()
+        : [action.payload[0]];
+
       //const keyPath = action.payload[0];
-      console.log("first node on reversed key path", reversedKeyPath[0]);
+      //console.log("first node on reversed key path", reversedKeyPath[0]);
       let splitUp = reversedKeyPath.reduce(
         (obj: object, next: string, i: number) =>
           i !== reversedKeyPath.indexOf(reversedKeyPath[0])
@@ -52,39 +71,33 @@ export const secondSlice = createSlice({
         console.log("hit array handle", endNodeOnKeyPath);
         switch (action.payload[2]) {
           case "update":
-            // const filtered = produce(state as SecondState & { endNodeOnKeyPath: any }, (draft: any) => {
-            //   console.log(state.todosArray);
-            //   console.log(draft);
-            //   return draft
-            // });
-            //console.log(state.todosArray.filter, "isDraft direct access");
-            //console.log(state["todosArray"]["filter"], "isDraft key access");
-            // return (state["todosArray"] = {
-            //   ...state["todosArray"][0],
-            //   done: false,
-            // });
-            const proxyOfProxy = state;
-            console.log("proxyOfProxy", proxyOfProxy[endNodeOnKeyPath]);
-            const isADraft = isDraft(proxyOfProxy);
-            console.log(isADraft);
-            const filtered = proxyOfProxy[endNodeOnKeyPath].filter(
-              (item: any) => item["id"] !== action.payload[1]["id"]
-            );
-
-            console.log("filtered", filtered, "initialState", initialState);
+            console.log("is our initial state a draft in this reducer?", isDraft(state));
             
-            const filteredDraft = createDraft(filtered);
-            const isADraft2 = isDraft(filteredDraft);
-            console.log(isADraft2);
+            const filtered = createDraft(
+              state[endNodeOnKeyPath].filter(
+                (item: any) => item["id"] !== action.payload[1]["id"]
+              )
+            );
+            console.log("did we create a filtered draft?", isDraft(filtered));
             console.log("we hit the update path");
-            arrayLogic = [...filtered, action.payload[1]];
-            // arrayLogic = arrayLogic.todosArray;
-            // arrayLogic = state.todosArray[1];
+            arrayLogic = [...original(filtered), action.payload[1]];
             break;
-          case "add":
-            arrayLogic = produce(state, (draft: any) => {
-              draft.todosArray.push(action.payload[1]);
-            });
+          case "updateSetPath":
+            // traverse down previously set path and set action.payload 1
+            console.log('hit update set path')
+            const traversePath = action.payload[0].split('.');
+            let nonPrimitive = state;
+            let draftNonPrimitive;
+            for (let i = 0; i < traversePath.length; i++) {
+                nonPrimitive = nonPrimitive[traversePath[i]]
+                console.log("does state persist as a draft?", isDraft(nonPrimitive));
+                if (i === traversePath.length - 1) {
+                    nonPrimitive = nonPrimitive.filter((item: any) => item['id'] !== action.payload[1]['id'])
+                    draftNonPrimitive = createDraft(nonPrimitive)
+                    console.log("is the filtered on the last loop a draft?", isDraft(draftNonPrimitive))
+                }
+            }
+            arrayLogic = [...original(draftNonPrimitive), action.payload[1]];
             break;
           default:
             break;
@@ -132,17 +145,17 @@ export const secondSlice = createSlice({
         let arrayLogic;
         switch (action.payload[2]) {
           case "update":
-            // const filtered = produce(state as CounterState & { endNodeOnKeyPath: any }, (draft: any) => {
-            //   console.log(state.todosArray);
-            //   console.log(draft);
-            //   return )
-            // });
-            console.log(state.todosArray.filter, "isDraft direct access");
-            console.log(state["todosArray"]["filter"], "isDraft key access");
-            return (state["todosArray"] = {
-              ...state["todosArray"][0],
-              done: false,
-            });
+          // const filtered = produce(state as CounterState & { endNodeOnKeyPath: any }, (draft: any) => {
+          //   console.log(state.todosArray);
+          //   console.log(draft);
+          //   return )
+          // });
+          // console.log(state.todosArray.filter, "isDraft direct access");
+          // console.log(state["todosArray"]["filter"], "isDraft key access");
+          // return (state["todosArray"] = {
+          //   ...state["todosArray"][0],
+          //   done: false,
+          // });
 
           //const filtered = state.todosArray.filter((item: any) => item['id'] !== action.payload[1]['id']);
           //console.log("filtered", filtered);
@@ -154,13 +167,13 @@ export const secondSlice = createSlice({
           //arrayLogic = arrayLogic.todosArray;
           //arrayLogic = state.todosArray[1];
 
-          case "add":
-            arrayLogic = produce(state, (draft: any) => {
-              draft.todosArray.push(action.payload[1]);
-            });
-            break;
-          default:
-            break;
+        //   case "add":
+        //     arrayLogic = produce(state, (draft: any) => {
+        //       draft.todosArray.push(action.payload[1]);
+        //     });
+        //     break;
+        //   default:
+        //     break;
         }
         console.log(
           "🚀 ~ file: secondSlice.ts ~ line 152 ~ arrayHandle ~ arrayLogic",
@@ -182,7 +195,7 @@ export const secondSlice = createSlice({
   },
 });
 
-export const { wrongHandler, nestedArrayHandler } = secondSlice.actions;
+export const { workingHandler, nestedArrayHandler } = secondSlice.actions;
 
 // The function below is called a selector and allows us to select a value from
 // the state. Selectors can also be defined inline where they're used instead of

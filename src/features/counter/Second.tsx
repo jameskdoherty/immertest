@@ -3,8 +3,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useAppSelector, useAppDispatch } from "../../app/hooks";
 
 import {
-  nestedArrayHandler,
-  wrongHandler,
+  workingHandler,
   selectCount,
   selectNestedCount,
 } from "./secondSlice";
@@ -19,7 +18,6 @@ export function Second() {
 
   const keyPathRef = useRef<any>(null);
   const [keyPath, setKeyPath] = useState<any>("");
-  console.log(keyPath);
   //const incrementValue = Number(incrementAmount) || 0;
 
   // const [baseState, setDatas] = useState([
@@ -58,7 +56,11 @@ export function Second() {
       <div className={styles.row}>
         <div>
           initialState:
-          {JSON.stringify(nestedCount)}
+          {
+            <div>
+              <pre>{JSON.stringify(nestedCount, null, 10)}</pre>
+            </div>
+          }
         </div>
       </div>
       <div className={styles.row}>
@@ -67,30 +69,53 @@ export function Second() {
           aria-label="Increment value"
           onClick={() =>
             dispatch(
-              wrongHandler([
-                'a.b.todosArray',
-                { id: "id2", done: true, body: "Check Email" },
+              workingHandler([
+                keyPath,
+                {
+                  id: "id3",
+                  done: true,
+                  body: "Coffee consumed",
+                },
                 "update",
               ])
             )
           }
         >
-          wrong way to filter todos
+          Update non-nested non primitive
         </button>
         <button
           className={styles.button}
           aria-label="Increment value"
           onClick={() =>
             dispatch(
-              nestedArrayHandler([
+              workingHandler([
                 keyPath,
-                { id: "id2", done: true, body: "Check Email" },
+                {
+                  id: "id2",
+                  done: false,
+                  body: "homework isn't done, but lets pretend it is",
+                },
                 "update",
               ])
             )
           }
         >
-          nestedHandler to filter todos
+          Setting nested path, borrowing a non prim in our state
+        </button>
+        <button
+          className={styles.button}
+          aria-label="Increment value"
+          onClick={() =>
+            dispatch(
+              workingHandler([
+                keyPath,
+                { id: "id2", done: true, body: "Homework is FINITO!!!" },
+                "updateSetPath",
+              ])
+            )
+          }
+        >
+          Update set path
         </button>
       </div>
       <div className={styles.row}>

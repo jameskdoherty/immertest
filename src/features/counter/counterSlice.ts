@@ -20,7 +20,7 @@ enablePatches();
 export interface CounterState {
   id: string;
   value: number;
-  users: Array<any>
+  //users: Array<any>
   //status: 'idle' | 'loading' | 'failed';
   //ArticleOneProps: object;
   todosArray: Array<any>;
@@ -398,7 +398,7 @@ export const counterSlice = createSlice({
             fork = produce(
               fork,
               draft => {
-                draft.tomosArray[0].done = true;
+                draft.todosArray[0].done = true;
               },
               (patches, inversePatches) => {
                 changes.push(...patches)
