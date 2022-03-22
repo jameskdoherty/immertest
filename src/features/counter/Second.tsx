@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useReducer } from "react";
+import delve from 'dlv'; 
+import { useAppSelector } from "../../app/hooks";
 
-import { useAppSelector, useAppDispatch } from "../../app/hooks";
-
-import { workingHandler, selectCount, selectNestedCount } from "./secondSlice";
+import { selectCount, selectNestedCount } from "./secondSlice";
 
 import styles from "./Counter.module.css";
 
@@ -12,12 +12,14 @@ export interface ThirdState {
   id: string;
   value: number;
   todosArray: any;
+  a: object;
 }
 
 export function Second() {
   const count = useAppSelector(selectCount);
   const nestedCount = useAppSelector(selectNestedCount);
-  const dispatch = useAppDispatch();
+  //const dispatch = useAppDispatch();
+
   //const [incrementAmount, setIncrementAmount] = useState('2');
 
   const keyPathRef = useRef<any>(null);
@@ -32,24 +34,43 @@ export function Second() {
       { id: "id2", done: false, body: "Do Homework" },
       { id: "id3", done: false, body: "Check Coffee" },
     ],
+    a: {
+      b: {
+        tomosArray: [
+          { id: "id4", done: true, body: "Brush Teethh" },
+          { id: "id5", done: false, body: "Do Homework" },
+          { id: "id6", done: false, body: "Read Book" },
+        ],
+      },
+    },
   };
 
-  useEffect(() => {
-    //console.log("🚀 ~ file: Counter.tsx ~ line 28 ~ useEffect ~ keyPath", keyPath)
-    //console.log("🚀 ~ file: Counter.tsx ~ line 29 ~ useEffect ~ count", count)
-  }, [keyPath, count]);
+  function reducer(state: any, action: any) {
+    switch (action.type) {
+      case "push":
+        const pushData = produce(state, (draft: any) => {
+            let nestedNodes = delve(draft, action.path);
+            console.log(JSON.stringify(nestedNodes)); 
+            nestedNodes.push(action.payload);
+        })
+        return pushData;
+      case "pop":
+        const popData = produce(state, (draft: any) => {
+            let nestedNodes = delve(draft, action.path);
+            console.log(JSON.stringify(nestedNodes)); 
+            nestedNodes.pop();
+        })
+        return popData;
+      default:
+        console.error(`Unhandled action type ${action.type}`);
+        return state;
+    }
+  }
+
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setKeyPath(e.target.value);
-  };
-  //console.log("🚀 ~ file: Counter.tsx ~ line 35 ~ Counter ~ nestedCount", nestedCount)
-
-  const updateState = (payload: any) => {
-    const newData = produce(initialState, draft => { 
-      console.log(payload);
-      draft.todosArray.push(payload);
-  });
-    console.log(initialState);
   };
 
   return (
@@ -59,21 +80,40 @@ export function Second() {
           initialState:
           {
             <div>
-              <pre>{JSON.stringify(initialState, null, 10)}</pre>
+              <pre>{JSON.stringify(state, null, 10)}</pre>
             </div>
           }
         </div>
       </div>
       <div className={styles.row}>
-      <button
-          onClick={() => updateState({ id: "id4", done: false, body: "Get Car Washed" })}
+        <button
+          onClick={() =>
+            dispatch({
+              type: "push",
+              payload: { id: "id7", done: false, body: "Get Car Cleaned" },
+              path: keyPath,
+            })
+          }
           // should change the body to whatever has been put into textbox
           // make update state function that dispatches and its action.payload accepts function
           //
         >
-            immer import direct
+          traverse and push
         </button>
         <button
+          onClick={() =>
+            dispatch({
+              type: "pop",
+              path: keyPath,
+            })
+          }
+          // should change the body to whatever has been put into textbox
+          // make update state function that dispatches and its action.payload accepts function
+          //
+        >
+          traverse and pop
+        </button>
+        {/* <button
           className={styles.button}
           aria-label="Increment value"
           onClick={() =>
@@ -125,8 +165,7 @@ export function Second() {
           }
         >
           Update set path
-        </button>
-        
+        </button> */}
       </div>
       <div className={styles.row}>
         <form className={styles.input}>
