@@ -2,21 +2,26 @@ import React, { useEffect, useState, useRef } from "react";
 
 import { useAppSelector, useAppDispatch } from "../../app/hooks";
 
-import { workingHandler, selectCount, selectNestedCount } from "./secondSlice";
+import { workingHandler, selectCount, selectNestedCount, updateSbtState } from "./secondSlice";
+
+import { createUpdateSbtStateAction } from "../sbtReducer";
 
 import styles from "./Counter.module.css";
 
-import { produce } from "immer";
+import { produce, current } from "immer";
+import {RootState} from "../../app/store";
 
 export interface ThirdState {
   id: string;
   value: number;
   todosArray: any;
+  sbt: any;
 }
 
 export function Second() {
   const count = useAppSelector(selectCount);
   const nestedCount = useAppSelector(selectNestedCount);
+  const state = useAppSelector((state: RootState) => state);
   const dispatch = useAppDispatch();
   //const [incrementAmount, setIncrementAmount] = useState('2');
 
@@ -24,15 +29,15 @@ export function Second() {
   const [keyPath, setKeyPath] = useState<any>("");
   //const incrementValue = Number(incrementAmount) || 0;
 
-  const initialState: ThirdState = {
-    id: "345",
-    value: 0,
-    todosArray: [
-      { id: "id1", done: true, body: "Take out the garbage" },
-      { id: "id2", done: false, body: "Do Homework" },
-      { id: "id3", done: false, body: "Check Coffee" },
-    ],
-  };
+  // const initialState: ThirdState = {
+  //   id: "345",
+  //   value: 0,
+  //   todosArray: [
+  //     { id: "id1", done: true, body: "Take out the garbage" },
+  //     { id: "id2", done: false, body: "Do Homework" },
+  //     { id: "id3", done: false, body: "Check Coffee" },
+  //   ]
+  // };
 
   useEffect(() => {
     //console.log("🚀 ~ file: Counter.tsx ~ line 28 ~ useEffect ~ keyPath", keyPath)
@@ -44,13 +49,16 @@ export function Second() {
   };
   //console.log("🚀 ~ file: Counter.tsx ~ line 35 ~ Counter ~ nestedCount", nestedCount)
 
-  const updateState = (payload: any) => {
-    const newData = produce(initialState, draft => { 
-      console.log(payload);
-      draft.todosArray.push(payload);
-  });
-    console.log(initialState);
-  };
+  const updateState = (callback: (draft: any) => any) => {
+      const newState = produce(state.sbt, callback)
+
+      dispatch(createUpdateSbtStateAction(newState));
+
+      //TODO: adc would broadcast:
+      /*/
+      TODO: broadcast(createUpdateSbtStateAction(callback))
+      /**/
+  }
 
   return (
     <div>
@@ -59,19 +67,24 @@ export function Second() {
           initialState:
           {
             <div>
-              <pre>{JSON.stringify(initialState, null, 10)}</pre>
+              <pre>{JSON.stringify(state, null, 10)}</pre>
             </div>
           }
         </div>
       </div>
       <div className={styles.row}>
       <button
-          onClick={() => updateState({ id: "id4", done: false, body: "Get Car Washed" })}
-          // should change the body to whatever has been put into textbox
+          // onClick={() => updateState({ id: "id4", done: false, body: "Get Car Washed" })}
+          onClick={() => updateState((draft) => {
+              draft.todosArray[2].body = keyPath
+              draft.todosArray.push({foo: 'bar'})
+              return draft;
+          })}
+          // should change the body to whatÏever has been put into textbox
           // make update state function that dispatches and its action.payload accepts function
           //
         >
-            immer import direct
+            immer import direct!!
         </button>
         <button
           className={styles.button}

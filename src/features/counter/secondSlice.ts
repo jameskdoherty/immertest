@@ -5,6 +5,7 @@ import {
   enableMapSet,
   original,
   createDraft,
+  current,
 } from "immer";
 
 enableMapSet();
@@ -14,6 +15,7 @@ export interface SecondState {
   value: number;
   todosArray: any;
   //a: object;
+  sbt2: any;
 }
 
 const initialState: SecondState = {
@@ -34,6 +36,12 @@ const initialState: SecondState = {
 //           ]
 //       }
 //   }
+
+  sbt2: [
+    { id: "id1", done: true, body: "Take out the trash" },
+    { id: "id2", done: false, body: "Do Homework" },
+    { id: "id3", done: false, body: "Check Coffee" }
+  ]
 };
 
 export const secondSlice = createSlice({
@@ -41,6 +49,12 @@ export const secondSlice = createSlice({
   initialState,
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: {
+    updateSbtState: (state: any, action: PayloadAction<(draft: any) => void>) => {
+      console.log(isDraft(current(state)), '<==isDraft');
+      action.payload(state);
+
+      //return state;
+    },
     workingHandler: (state: any, action: PayloadAction<any>) => {
       //   let splitKeyPath = Array.isArray(action.payload[0]) //action.payload[0] = keyPath
       //     ? action.payload[0]
@@ -195,7 +209,7 @@ export const secondSlice = createSlice({
   },
 });
 
-export const { workingHandler, nestedArrayHandler } = secondSlice.actions;
+export const { workingHandler, nestedArrayHandler, updateSbtState } = secondSlice.actions;
 
 // The function below is called a selector and allows us to select a value from
 // the state. Selectors can also be defined inline where they're used instead of
